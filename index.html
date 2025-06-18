@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>智慧菸盒心率顯示</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', '微軟正黑體', Arial, sans-serif;
+      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      overflow-x: hidden;
+    }
+    .bg-deco {
+      position: absolute;
+      top: -80px;
+      left: -80px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle at 60% 40%, #a1c4fd 0%, #c2e9fb 100%);
+      border-radius: 50%;
+      opacity: 0.35;
+      z-index: 0;
+      animation: float1 8s ease-in-out infinite alternate;
+    }
+    .bg-deco2 {
+      position: absolute;
+      bottom: -100px;
+      right: -100px;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle at 40% 60%, #fbc2eb 0%, #a6c1ee 100%);
+      border-radius: 50%;
+      opacity: 0.25;
+      z-index: 0;
+      animation: float2 10s ease-in-out infinite alternate;
+    }
+    @keyframes float1 {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(30px) scale(1.08); }
+    }
+    @keyframes float2 {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-30px) scale(1.05); }
+    }
+    h1 {
+      margin-top: 48px;
+      color: #2d3a4b;
+      letter-spacing: 2px;
+      font-size: 2.5em;
+      font-weight: 700;
+      z-index: 1;
+      text-shadow: 0 2px 8px rgba(180,200,255,0.12);
+      background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .card {
+      background: rgba(255,255,255,0.97);
+      border-radius: 28px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.13);
+      padding: 44px 54px 32px 54px;
+      margin-top: 36px;
+      min-width: 340px;
+      max-width: 95vw;
+      display: inline-block;
+      z-index: 1;
+      position: relative;
+      border: 2px solid #e3eafc;
+      backdrop-filter: blur(3px);
+      transition: box-shadow 0.2s, border 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 20px 48px rgba(0,123,255,0.13);
+      border: 2.5px solid #b2d8ff;
+    }
+    .info-row {
+      font-size: 1.4em;
+      margin: 26px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid #eaeaea;
+      padding-bottom: 12px;
+      transition: background 0.2s;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .label {
+      color: #4a6073;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .value {
+      color: #007bff;
+      font-size: 1.7em;
+      font-weight: bold;
+      min-width: 70px;
+      text-align: right;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: color 0.2s;
+    }
+    #remind {
+      color: #e67e22;
+      font-size: 1.3em;
+      font-weight: bold;
+      text-shadow: 0 1px 4px rgba(230,103,34,0.08);
+      letter-spacing: 1px;
+    }
+    #interval {
+      color: #16a085;
+      font-size: 1.3em;
+      font-weight: bold;
+      text-shadow: 0 1px 4px rgba(22,160,133,0.08);
+      letter-spacing: 1px;
+    }
+    #connectBtn {
+      font-size: 1.3em;
+      padding: 16px 54px;
+      margin-top: 48px;
+      background: linear-gradient(90deg, #007bff 0%, #00c6ff 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      box-shadow: 0 6px 20px rgba(0,123,255,0.13);
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+      font-weight: 700;
+      letter-spacing: 1px;
+      z-index: 1;
+    }
+    #connectBtn:hover {
+      background: linear-gradient(90deg, #005fa3 0%, #00a6d6 100%);
+      box-shadow: 0 12px 32px rgba(0,123,255,0.18);
+      transform: translateY(-2px) scale(1.04);
+    }
+    @media (max-width: 500px) {
+      .card { padding: 18px 6vw 14px 6vw; min-width: unset; }
+      h1 { font-size: 1.3em; }
+      .info-row { font-size: 1em; }
+      #connectBtn { font-size: 1em; padding: 10px 18vw; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-deco"></div>
+  <div class="bg-deco2"></div>
+  <h1>智慧菸盒健康監控</h1>
+  <div class="card">
+    <div class="info-row"><span class="label">心率</span><span class="value" id="hr">--</span></div>
+    <div class="info-row"><span class="label">壓力</span><span class="value" id="stress">--</span></div>
+    <div class="info-row"><span class="label">提醒</span><span class="value" id="remind">--</span></div>
+    <div class="info-row"><span class="label">今日吸菸次數</span><span class="value" id="smokeCount">0</span></div>
+    <div class="info-row"><span class="label">距離下次可吸菸</span><span class="value" id="interval">--</span></div>
+  </div>
+  <div class="card" style="margin-top:32px;">
+    <div style="font-weight:700;font-size:1.1em;color:#2d3a4b;margin-bottom:10px;letter-spacing:1px;">歷史吸菸紀錄</div>
+    <table id="historyTable" style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#f3f8ff;color:#007bff;font-size:1em;">
+          <th style="padding:6px 0;border-bottom:1.5px solid #eaeaea;">日期</th>
+          <th style="padding:6px 0;border-bottom:1.5px solid #eaeaea;">時間</th>
+        </tr>
+      </thead>
+      <tbody id="historyBody">
+      </tbody>
+    </table>
+  </div>
+  <button id="connectBtn">連接Arduino</button>
+  <script>
+    let port;
+    let reader;
+    document.getElementById('connectBtn').onclick = async () => {
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 9600 });
+        reader = port.readable.getReader();
+        readLoop();
+      } catch (e) {
+        alert('連接失敗: ' + e);
+      }
+    };
+    let tempData = { hr: '--', stress: '--', remind: '--' };
+    let smokeCount = 0;
+    let lastSmokeTime = null;
+    const minInterval = 60 * 60 * 1000; // 1小時，單位毫秒
+    // 歷史紀錄
+    let smokeHistory = JSON.parse(localStorage.getItem('smokeHistory') || '[]');
+    function renderHistory() {
+      const tbody = document.getElementById('historyBody');
+      tbody.innerHTML = smokeHistory.slice(-20).reverse().map(item =>
+        `<tr><td style='padding:4px 0;border-bottom:1px solid #f0f0f0;'>${item.date}</td><td style='padding:4px 0;border-bottom:1px solid #f0f0f0;'>${item.time}</td></tr>`
+      ).join('');
+    }
+    renderHistory();
+    async function readLoop() {
+      let buffer = '';
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += new TextDecoder().decode(value);
+        let lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (let line of lines) {
+          line = line.trim();
+          if (line.startsWith('心率:')) {
+            tempData.hr = line.replace('心率:', '').trim();
+            document.getElementById('hr').innerText = tempData.hr;
+          } else if (line.startsWith('壓力:')) {
+            tempData.stress = line.replace('壓力:', '').trim();
+            document.getElementById('stress').innerText = tempData.stress;
+          } else if (line.startsWith('提醒:')) {
+            tempData.remind = line.replace('提醒:', '').trim();
+            document.getElementById('remind').innerText = tempData.remind;
+          } else if (line.startsWith('吸菸:')) {
+            // 當Arduino輸出 "吸菸: 1" 時，累加次數並記錄時間
+            smokeCount++;
+            document.getElementById('smokeCount').innerText = smokeCount;
+            lastSmokeTime = Date.now();
+            // 新增歷史紀錄
+            const now = new Date();
+            const dateStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+            const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+            smokeHistory.push({date: dateStr, time: timeStr});
+            localStorage.setItem('smokeHistory', JSON.stringify(smokeHistory));
+            renderHistory();
+    // 每天自動歸零（以本地時間0點為準）
+    // 歷史紀錄不會自動清除，僅顯示最近20筆
+    // 每天自動歸零（以本地時間0點為準）
+    let lastResetDate = new Date().toDateString();
+    setInterval(() => {
+      let now = new Date().toDateString();
+      if (now !== lastResetDate) {
+        smokeCount = 0;
+        document.getElementById('smokeCount').innerText = smokeCount;
+        lastResetDate = now;
+      }
+      // 顯示距離下次可吸菸的倒數
+      if (lastSmokeTime) {
+        let remain = minInterval - (Date.now() - lastSmokeTime);
+        if (remain > 0) {
+          let min = Math.floor(remain / 60000);
+          let sec = Math.floor((remain % 60000) / 1000);
+          document.getElementById('interval').innerText = `${min}分${sec}秒`;
+        } else {
+          document.getElementById('interval').innerText = '可吸菸';
+        }
+      } else {
+        document.getElementById('interval').innerText = '--';
+      }
+    }, 1000); // 每秒更新一次
+          }
+    // 每天自動歸零（以本地時間0點為準）
+    let lastResetDate = new Date().toDateString();
+    setInterval(() => {
+      let now = new Date().toDateString();
+      if (now !== lastResetDate) {
+        smokeCount = 0;
+        document.getElementById('smokeCount').innerText = smokeCount;
+        lastResetDate = now;
+      }
+    }, 60000); // 每分鐘檢查一次
+        }
+      }
+    }
+  </script>
+</body>
+</html>
